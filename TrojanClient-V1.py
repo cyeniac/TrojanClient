@@ -1,10 +1,12 @@
 import tkinter as tk
 from tkinter import ttk, filedialog
 from threading import Thread
+from PIL import Image
 import os
 import subprocess
 import json
 import utils
+import pystray
 
 
 current_path = os.path.dirname(os.path.abspath(__name__))
@@ -21,6 +23,7 @@ class TrojanClient:
 	def setup_ui(self):
 		# 根窗口
 		self.root = tk.Tk()
+		self.root.iconbitmap('favicon16x16.ico')
 		self.root.title('Trojan客户端')
 		screen_width = self.root.winfo_screenwidth()
 		screen_height = self.root.winfo_screenheight()
@@ -29,6 +32,7 @@ class TrojanClient:
 		self.root.geometry(f'{app_width}x{app_height}+{int(screen_width/2-app_width/2)}+{int(screen_height/2-app_width/2)}')
 		self.root.resizable(width=False, height=False)
 		self.root.protocol("WM_DELETE_WINDOW", self.on_closing)
+		self.root.bind('<Unmap>', self.hide_windows)  # 窗口最小化事件
 
 		# 可修改的配置信息
 		self.config = {
@@ -102,7 +106,18 @@ class TrojanClient:
 		status_frame.pack(fill=tk.X, padx='5px')
 		self.state = ttk.Label(master=status_frame, text='未运行')
 		self.state.pack(side=tk.LEFT,padx='5px', pady='5px')
-	
+
+		# 系统托盘
+		strap_menu = (
+			pystray.MenuItem(text='显示', action=self.show_window, default=True),
+			pystray.Menu.SEPARATOR, # 分割线
+			pystray.MenuItem(text='退出', action=self.on_closing)
+		)
+		image = Image.open('favicon16x16.ico')
+		self.ico = pystray.Icon("TrojanClient", image, 'Trojan客户端', strap_menu)
+		Thread(target=self.ico.run, daemon=True).start()
+
+
 	def load_config(self):
 		config_file = f'{current_path}{os.path.sep}client.json'
 		try:
@@ -188,6 +203,13 @@ class TrojanClient:
 		self.start_button.config(state=tk.NORMAL)
 		self.stop_button.config(state=tk.DISABLED)
 		self.state.config(text='未运行')
+	
+	def show_window(self):
+		self.root.deiconify()
+	
+	def hide_windows(self, other):
+		self.root.withdraw()
+		print(other)
 	
 	def select_cert(self):
 		path = filedialog.askopenfilename()
