@@ -69,7 +69,8 @@ class TrojanClient:
 		self.log_level.grid(row=0, column=3,padx='5px', pady='2px')
 		
 		ttk.Label(master=config_info_frame, text='是否启用SSL').grid(row=1, column=2,padx='5px', pady='2px')
-		ttk.Radiobutton(master=config_info_frame, variable=self.config['ssl_verify'], value=True, text='是').grid(row=1, column=3,padx='5px', pady='2px') # variable使用同一个对象，代表一个互斥组，选择一个，其他的就会失效
+		# variable使用同一个对象，代表一个互斥组，选择一个，其他的就会失效
+		ttk.Radiobutton(master=config_info_frame, variable=self.config['ssl_verify'], value=True, text='是').grid(row=1, column=3,padx='5px', pady='2px') 
 		ttk.Radiobutton(master=config_info_frame, variable=self.config['ssl_verify'], value=False, text='否').grid(row=1, column=4,padx='5px', pady='2px')
 
 		ttk.Label(master=config_info_frame, text='SSL证书').grid(row=2, column=2,padx='5px', pady='2px')
@@ -106,6 +107,8 @@ class TrojanClient:
 		status_frame.pack(fill=tk.X, padx='5px')
 		self.state = ttk.Label(master=status_frame, text='未运行')
 		self.state.pack(side=tk.LEFT,padx='5px', pady='5px')
+		ttk.Label(master=status_frame, text='作者: YOUNG').pack(side='right')
+
 
 		# 系统托盘
 		strap_menu = (
